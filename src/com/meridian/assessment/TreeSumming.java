@@ -1,43 +1,78 @@
 package com.meridian.assessment;
 
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 
 public class TreeSumming {
-	public static boolean checkRootToLeafPath(int sum, int target, char c, FileReader inputStream) throws IOException{
-		int token = 0;
-		while(c == ' ' || c == '\n')
-			c = (char)inputStream.read();
-		if(c == '('){
-			while((c = (char) inputStream.read()) !=-1 ){
-				if(Character.isDigit(c)){
-					 token = token*10 + Character.getNumericValue(c);
-				}
-			}
-		}
-		while(c == ' ' || c == '\n')
-			c = (char)inputStream.read();
-		boolean left = checkRootToLeafPath(sum + token, target,'(',inputStream );
-		boolean right = checkRootToLeafPath(sum + token, target,')',inputStream );
-		if (left == true && right == true && sum == target)
-			return true;
-		return false;
-	}
-public static void main(String args[]) throws IOException{
-	
-	 FileReader inputStream = null;
 
-     try {
-         inputStream = new FileReader("xanadu.txt");
-         int c;
-         while ((c = inputStream.read()) != -1) {
-        	 checkRootToLeafPath(0, Character.getNumericValue(c),);
-         }
-     } finally {
-         if (inputStream != null) {
-             inputStream.close();
-         }
-     }
-}
+	static FileReader inputStream;
+	static boolean yes;
+	static {
+		try {
+			inputStream = new FileReader("resource/input.txt");
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+	}
+
+	public boolean processTree(int sum, int target, char ch) throws IOException {
+		int token = 0;
+		while (ch == ' ' || ch == '\n')
+			ch = (char) inputStream.read();
+		if (ch == '(') {
+			ch = (char) inputStream.read();
+			while (ch != ')' && ch != '(') {
+				if (Character.isDigit(ch)) {
+					token = token * 10 + Character.getNumericValue(ch);
+					;
+				}
+				ch = (char) inputStream.read();
+			}
+			while (ch == ' ' || ch == '\n')
+				ch = (char) inputStream.read();
+			sum += token;
+			boolean left = processTree(sum, target, ' ');
+			while (ch != '(')
+				ch = (char) inputStream.read();
+			boolean right = processTree(sum, target, ' ');
+
+			if (left == false && right == false) {
+				if (sum == target)
+					yes = true;
+
+			}
+			while (ch != ')')
+				ch = (char) inputStream.read();
+		}
+		return true;
+	}
+
+	public static void main(String[] args) {
+
+		try {
+			TreeSumming treeSumming = new TreeSumming();
+			int ch;
+			int target = 0;
+			boolean result = false;
+			while ((ch = inputStream.read()) != -1) {
+				while ((char) ch != ' ') {
+
+					if (Character.isDigit((char) ch)) {
+						target = target * 10 + Character.getNumericValue(ch);
+					}
+					ch = (char) inputStream.read();
+				}
+				treeSumming.processTree(0, target, ' ');
+				if (yes == true)
+					System.out.println("yes");
+				else
+					System.out.println("no");
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			System.out.println(e);
+			e.printStackTrace();
+		}
+
+	}
 }
